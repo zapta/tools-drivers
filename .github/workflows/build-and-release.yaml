@@ -61,7 +61,7 @@ jobs:
       - name: Create build-info file
         run: |
           ls -al
-          out="package/BUILD-INFO"
+          out="this-repo/package/BUILD-INFO"
 
           echo "[apio-build-info]" >> ${out}
           echo "package = drivers" >> ${out}
@@ -75,15 +75,15 @@ jobs:
           echo "release-tag:  $RELEASE_TAG" >> ${out}
 
           ls -al
-          cat -n package/BUILD-INFO
+          cat -n this-repo/package/BUILD-INFO
 
-          find package
+          find this-repo/package
 
 
       - name: Compress the package directory
         run: |
-          pushd package
-          tar zcf ../${PACKAGE_NAME} ./*
+          pushd this-repo/package
+          tar zcf ../../${PACKAGE_NAME} ./*
           popd
           ls -al
 
@@ -96,7 +96,7 @@ jobs:
 
           echo "BUILD-INFO file:"
           echo '```' >> $out
-          cat BUILD-INFO >> $out
+          cat this-repo/packages/BUILD-INFO >> $out
           echo '```' >> $out
 
           echo -e "\n<br>\n" >> $out
