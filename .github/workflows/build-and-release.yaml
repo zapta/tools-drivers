@@ -96,7 +96,7 @@ jobs:
 
           echo "BUILD-INFO file:"
           echo '```' >> $out
-          cat this-repo/packages/BUILD-INFO >> $out
+          cat this-repo/package/BUILD-INFO >> $out
           echo '```' >> $out
 
           echo -e "\n<br>\n" >> $out
