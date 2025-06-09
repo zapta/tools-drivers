@@ -1,0 +1,114 @@
+name: "build-and-release"
+
+on:
+  # Run on each commit to this repo.
+  push:
+
+  # Run every day at 2AM.
+  schedule:
+    - cron: '0 2 * * *'
+
+  # Allow manual activations.
+  workflow_dispatch:
+
+permissions:
+  # Allow release creation
+  contents: write
+
+jobs:
+
+  build-and-release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # E.g. "2025-11-02"
+      - name: Determine release tag
+        run: |
+          release_tag="$(date +'%Y-%m-%d')"
+          echo $release_tag
+          echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
+
+          
+      # E.g. "20251102"
+      - name: Determine package tag
+        run: |
+          package_tag="${RELEASE_TAG//-/}"
+          echo $package_tag
+          echo "PACKAGE_TAG=$package_tag" >> $GITHUB_ENV
+
+
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: this-repo
+
+      - name: Determine last commit
+        run: |
+          commit=$(git -C this-repo rev-parse HEAD)
+          echo $commit
+          echo "RELEASE_COMMIT=$commit" >> $GITHUB_ENV
+
+
+      - name: Determine package file name
+        run: |
+          package_name="apio-drivers-${PACKAGE_TAG}.tar.gz"
+          echo $package_name
+          echo "PACKAGE_NAME=$package_name" >> $GITHUB_ENV
+
+
+      - name: Create build-info file
+        run: |
+          out="package/BUILD-INFO"
+
+          echo "[apio-build-info]" >> ${out}
+          echo "package = drivers" >> ${out}
+          echo "time = $(date +'%Y-%m-%d %H:%M:%S %Z')" >> ${out}
+          echo "repo = ${{github.repository}}" >> ${out}
+          echo "workflow = ${{github.workflow}}" >> ${out}
+          echo "run-id = ${{github.run_id}}" >> ${out}
+          echo "run-number = ${{github.run_number}}" >> ${out}
+          echo "commit = $RELEASE_COMMIT" >>  ${out}
+          echo "package-tag:  $RELEASE_TAG" >> ${out}
+          echo "release-tag:  $RELEASE_TAG" >> ${out}
+
+          ls -al
+          cat -n package/BUILD-INFO
+
+          find package
+
+
+      - name: Compress the package directory
+        run: |
+          pushd package
+          tar zcf ../${PACKAGE_NAME} ./*
+          popd
+          ls -al
+
+      - name: Prepare release text
+        run: |
+          out=RELEASE_BODY.txt
+          echo "This is an automated release-and-build of the Apio drivers package." >> $out
+
+          echo -e "\n<br>\n" >> $out
+
+          echo "BUILD-INFO file:"
+          echo '```' >> $out
+          cat BUILD-INFO >> $out
+          echo '```' >> $out
+
+          echo -e "\n<br>\n" >> $out
+          cat -n $out
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{env.RELEASE_TAG}}
+          name: ${{env.RELEASE_TAG}}
+          body_path: RELEASE_BODY.txt
+          preserve_order: true
+          fail_on_unmatched_files: true
+          files: |
+            ${{env.PACKAGE_NAME}}
+
