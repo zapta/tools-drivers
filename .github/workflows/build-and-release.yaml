@@ -60,6 +60,7 @@ jobs:
 
       - name: Create build-info file
         run: |
+          ls -al
           out="package/BUILD-INFO"
 
           echo "[apio-build-info]" >> ${out}
