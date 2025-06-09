@@ -53,7 +53,7 @@ jobs:
 
       - name: Determine package file name
         run: |
-          package_name="apio-drivers-${PACKAGE_TAG}.tar.gz"
+          package_name="apio-drivers-windows-amd64-${PACKAGE_TAG}.tar.gz"
           echo $package_name
           echo "PACKAGE_NAME=$package_name" >> $GITHUB_ENV
 
