@@ -30,7 +30,7 @@ jobs:
           echo $release_tag
           echo "RELEASE_TAG=$release_tag" >> $GITHUB_ENV
 
-          
+
       # E.g. "20251102"
       - name: Determine package tag
         run: |
@@ -103,7 +103,7 @@ jobs:
           cat -n $out
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.2.2
         with:
           tag_name: ${{env.RELEASE_TAG}}
           name: ${{env.RELEASE_TAG}}
