@@ -103,12 +103,12 @@ jobs:
           cat -n $out
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{env.RELEASE_TAG}}
           name: ${{env.RELEASE_TAG}}
           body_path: RELEASE_BODY.txt
-          preserve_order: true
+          #preserve_order: true
           fail_on_unmatched_files: true
           files: |
             ${{env.PACKAGE_NAME}}
