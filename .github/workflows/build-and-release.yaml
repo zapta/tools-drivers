@@ -102,14 +102,13 @@ jobs:
           echo -e "\n<br>\n" >> $out
           cat -n $out
 
-      # TODO: Version v2 crashes. Fix and restore preserve_order.
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{env.RELEASE_TAG}}
           name: ${{env.RELEASE_TAG}}
           body_path: RELEASE_BODY.txt
-          #preserve_order: true
+          preserve_order: true
           fail_on_unmatched_files: true
           files: |
             ${{env.PACKAGE_NAME}}
