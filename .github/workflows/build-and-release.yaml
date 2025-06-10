@@ -41,12 +41,17 @@ jobs:
 
       - name: Checkout this repo
         uses: actions/checkout@v4
-        with:
-          path: this-repo
 
       - name: Determine last commit
         run: |
-          commit=$(git -C this-repo rev-parse HEAD)
+          commit=$(git rev-parse HEAD)
+          echo $commit
+          echo "RELEASE_COMMIT=$commit" >> $GITHUB_ENV
+
+
+      - name: Determine last commit
+        run: |
+          commit=$(git rev-parse HEAD)
           echo $commit
           echo "RELEASE_COMMIT=$commit" >> $GITHUB_ENV
 
@@ -57,33 +62,54 @@ jobs:
           echo $package_name
           echo "PACKAGE_NAME=$package_name" >> $GITHUB_ENV
 
-
-      - name: Create build-info file
+      - name: Create the common package.json file
         run: |
+          out="package.json"
+
+          echo "{" >> ${out}
+          echo "  \"name\": \"drivers\"," >> ${out}
+          echo "  \"description\": \"Drivers tools for Apio\"," >> ${out}
+          echo "  \"version\": \"$RELEASE_TAG\"," >> ${out}
+          echo "  \"build-repo\": \"${{github.repository}}\"," >> ${out}
+          echo "  \"workflow\": \"${{github.workflow}}\"," >> ${out}
+          echo "  \"workflow-run\": \"${{github.run_id}}\"," >> ${out}
+          echo "  \"time\": \"$(date +'%Y-%m-%d %H:%M:%S %Z')\"," >> ${out}
+          echo "  \"commit\": \"$RELEASE_COMMIT\"" >> ${out}
+          echo "  \"target-platform": \"windows-amd64\"" >> ${out}
+          echo "  \"file-name": \"PACKAGE_NAME\"" >> ${out}
+          echo "}" >> ${out}
+
+          pwd
           ls -al
-          out="this-repo/package/BUILD-INFO"
+          cat -n package.json 
 
-          echo "[apio-build-info]" >> ${out}
-          echo "package = drivers" >> ${out}
-          echo "time = $(date +'%Y-%m-%d %H:%M:%S %Z')" >> ${out}
-          echo "repo = ${{github.repository}}" >> ${out}
-          echo "workflow = ${{github.workflow}}" >> ${out}
-          echo "run-id = ${{github.run_id}}" >> ${out}
-          echo "run-number = ${{github.run_number}}" >> ${out}
-          echo "commit = $RELEASE_COMMIT" >>  ${out}
-          echo "package-tag:  $RELEASE_TAG" >> ${out}
-          echo "release-tag:  $RELEASE_TAG" >> ${out}
+      # - name: Create build-info file
+      #   run: |
+      #     ls -al
+      #     out="this-repo/package/BUILD-INFO"
 
-          ls -al
-          cat -n this-repo/package/BUILD-INFO
+      #     echo "[apio-build-info]" >> ${out}
+      #     echo "package = drivers" >> ${out}
+      #     echo "time = $(date +'%Y-%m-%d %H:%M:%S %Z')" >> ${out}
+      #     echo "repo = ${{github.repository}}" >> ${out}
+      #     echo "workflow = ${{github.workflow}}" >> ${out}
+      #     echo "run-id = ${{github.run_id}}" >> ${out}
+      #     echo "run-number = ${{github.run_number}}" >> ${out}
+      #     echo "commit = $RELEASE_COMMIT" >>  ${out}
+      #     echo "package-tag:  $RELEASE_TAG" >> ${out}
+      #     echo "release-tag:  $RELEASE_TAG" >> ${out}
 
-          find this-repo/package
+      #     ls -al
+      #     cat -n this-repo/package/BUILD-INFO
+
+      #     find this-repo/package
 
 
       - name: Compress the package directory
         run: |
-          pushd this-repo/package
-          tar zcf ../../${PACKAGE_NAME} ./*
+          # pushd this-repo/package
+          pushd package
+          tar zcf ../${PACKAGE_NAME} ./*
           popd
           ls -al
 
@@ -96,7 +122,7 @@ jobs:
 
           echo "BUILD-INFO file:"
           echo '```' >> $out
-          cat this-repo/package/BUILD-INFO >> $out
+          cat package.json >> $out
           echo '```' >> $out
 
           echo -e "\n<br>\n" >> $out
