@@ -75,8 +75,8 @@ jobs:
           echo "  \"workflow-run\": \"${{github.run_id}}\"," >> ${out}
           echo "  \"time\": \"$(date +'%Y-%m-%d %H:%M:%S %Z')\"," >> ${out}
           echo "  \"commit\": \"$RELEASE_COMMIT\"" >> ${out}
-          echo "  \"target-platform": \"windows-amd64\"" >> ${out}
-          echo "  \"file-name": \"PACKAGE_NAME\"" >> ${out}
+          echo "  \"target-platform\": \"windows-amd64\"" >> ${out}
+          echo "  \"file-name\": \"PACKAGE_NAME\"" >> ${out}
           echo "}" >> ${out}
 
           pwd
