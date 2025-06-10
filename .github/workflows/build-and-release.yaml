@@ -102,6 +102,7 @@ jobs:
           echo -e "\n<br>\n" >> $out
           cat -n $out
 
+      # TODO: Version v2 crashes. Fix and restore preserve_order.
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
